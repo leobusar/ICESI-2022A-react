@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { TextField, FormControlLabel, Checkbox, Button } from '@mui/material'
 
-const  TaskForm = ({addTask}) => {
-    const [ taskEdit, setTaskEdit ] = useState({title: ""});
-    const [ completed, setCompleted ] = useState(false);
+const  TaskForm = ({addTask, task}) => {
+    const [ taskEdit, setTaskEdit ] = useState({title: "", completed: false});
+
+    useEffect( ()=> {
+        setTaskEdit(task)
+    }, [task])
 
     const handleChange = (event) => {
         setTaskEdit({
@@ -12,15 +15,18 @@ const  TaskForm = ({addTask}) => {
     }
 
     const handleChangeC = (event) => {
-        setCompleted(event.target.checked)
+        setTaskEdit({
+            ...taskEdit,
+            completed: event.target.checked})
+
+        //setCompleted(event.target.checked)
     }
 
     const handleClick = () => {
-        let id = Math.floor(Math.random()*10000)
-        const task =  { id, title: taskEdit.title, completed, userId: 1}
+        //let id = Math.floor(Math.random()*10000)
+        const task =  {...taskEdit}
         //console.log(task)
-        setTaskEdit({title: ""})
-        setCompleted(false)
+        setTaskEdit({title: "", completed: false})
         addTask(task)
     }
 
@@ -30,12 +36,12 @@ const  TaskForm = ({addTask}) => {
         <TextField id="standard-basic" name="title" variant="standard"  value={taskEdit.title} onChange={handleChange} />
         <FormControlLabel control={
                 <Checkbox defaultChecked name="terminada" color="primary" 
-                          checked={completed} onChange={handleChangeC} />
+                          checked={taskEdit.completed} onChange={handleChangeC} />
                 } 
                 label="Completed" />
 
         <Button variant="contained" color="primary" onClick={handleClick} >
-            Agregar
+            { task.id?"Actualizar":"Agregar"}
         </Button>
 
     </form>

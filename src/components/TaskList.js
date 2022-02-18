@@ -1,61 +1,55 @@
 import React, { useState, useEffect } from 'react'
 import {Paper, Table, TableContainer, TableCell, TableHead, TableRow, TableBody} from  '@mui/material'
+import axios from '../config/axios'
 import Task from './Task'
 import TaskForm from './TaskForm'
 
 function TaskList({ owner }) {
   const [tasksList, setTasksList] = useState([])
+  const [taskEdit, setTaskEdit] = useState({})
 
   useEffect(() => {
-    let tasks = [{
-      "userId": 1,
-      "id": 1,
-      "title": "delectus aut autem",
-      "completed": false
-    },
-    {
-      "userId": 1,
-      "id": 2,
-      "title": "quis ut nam facilis et officia qui",
-      "completed": false
-    },
-    {
-      "userId": 1,
-      "id": 3,
-      "title": "fugiat veniam minus",
-      "completed": false
-    },
-    {
-      "userId": 1,
-      "id": 4,
-      "title": "et porro tempora",
-      "completed": true
-    },
-    {
-      "userId": 1,
-      "id": 5,
-      "title": "laboriosam mollitia et enim quasi adipisci quia provident illum",
-      "completed": false
-    }
-    ]
+    axios.get("todos?_start=100&_limit=5")
+         .then((res) => 
+            setTasksList(res.data)
+         )
 
-    setTasksList(tasks)
   }, [])
 
   const addTask = (task) => {
     let tasks = [...tasksList]
-    tasks.push(task)
+    if (!task.id){
+      task.id = Math.floor(Math.random()*10000)
+      tasks.push(task)
+    }else{
+      let index = tasks.findIndex( taskItem => taskItem.id === task.id )
+      tasks[index] = task
+      setTaskEdit({})
+    }
     setTasksList(tasks)
   }
+
+  const delTask  = (task) => {
+    let tasks = [...tasksList]
+    let index = tasks.findIndex( taskItem => taskItem.id === task.id )
+//    tasks.push(task)
+    tasks.splice(index,1)
+    setTasksList(tasks)
+  }
+
+  const editTask = (task) => {
+    setTaskEdit(task)
+  }
+
   const renderTasks = () => {
-    return tasksList.map(task => <Task task={task} key={task.id} />)
+    return tasksList.map(task => <Task task={task} key={task.id} delTask={delTask} editTask={editTask}/>)
   }
 
   console.log(owner)
   return (
     <div>
       <h1>Lista de tareas de {owner.nombre} {owner.apellido} </h1>
-      <TaskForm addTask={addTask}/>
+      <TaskForm addTask={addTask} task={taskEdit}/>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 300, maxWidth: 700, m: "auto" }} aria-label="simple table">
           <TableHead>
@@ -63,6 +57,7 @@ function TaskList({ owner }) {
               <TableCell>Id</TableCell>
               <TableCell align="right">Title</TableCell>
               <TableCell align="right">Completed</TableCell>
+              <TableCell align="center">Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
