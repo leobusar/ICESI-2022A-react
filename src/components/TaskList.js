@@ -1,32 +1,49 @@
 import React, { useState, useEffect } from 'react'
 import {Paper, Table, TableContainer, TableCell, TableHead, TableRow, TableBody} from  '@mui/material'
-import axios from '../config/axios'
+//import axios from '../config/axios'
 import Task from './Task'
 import TaskForm from './TaskForm'
+import firebase from  '../config/firebase'
+import { getFirestore, collection, getDocs, setDoc, doc } from 'firebase/firestore'
 
 function TaskList({ owner }) {
   const [tasksList, setTasksList] = useState([])
   const [taskEdit, setTaskEdit] = useState({})
+  const firebaseDb = getFirestore(firebase)
 
   useEffect(() => {
-    axios.get("todos?_start=100&_limit=5")
-         .then((res) => 
-            setTasksList(res.data)
-         )
-
+    // axios.get("todos?_start=100&_limit=5")
+    //      .then((res) => 
+    //         setTasksList(res.data)
+    //      )
+    getTodos(firebaseDb)
+      .then( (res) => setTasksList(res)) 
   }, [])
+
+  const getTodos = async (db) => {
+    const todosCol = collection(db, 'todos')
+    const todosCursor = await getDocs(todosCol)
+    const todoList =  todosCursor.docs.map(doc => doc.data())
+
+    return todoList
+  }
 
   const addTask = (task) => {
     let tasks = [...tasksList]
-    if (!task.id){
-      task.id = Math.floor(Math.random()*10000)
-      tasks.push(task)
-    }else{
-      let index = tasks.findIndex( taskItem => taskItem.id === task.id )
-      tasks[index] = task
-      setTaskEdit({})
-    }
-    setTasksList(tasks)
+    if (!task.id)
+        task.id = Math.floor(Math.random()*10000)
+    setDoc(doc(firebaseDb, "todos", task.id+""), task)
+        .then(() => {
+          getTodos(firebaseDb)
+          .then( (res) => setTasksList(res))
+        })
+    //   tasks.push(task)
+    // }else{
+    //   let index = tasks.findIndex( taskItem => taskItem.id === task.id )
+    //   tasks[index] = task
+    //   setTaskEdit({})
+    
+    //setTasksList(tasks)
   }
 
   const delTask  = (task) => {
