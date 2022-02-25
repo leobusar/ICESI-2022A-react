@@ -4,7 +4,7 @@ import {Paper, Table, TableContainer, TableCell, TableHead, TableRow, TableBody}
 import Task from './Task'
 import TaskForm from './TaskForm'
 import firebase from  '../config/firebase'
-import { getFirestore, collection, getDocs, setDoc, doc } from 'firebase/firestore'
+import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore'
 
 function TaskList({ owner }) {
   const [tasksList, setTasksList] = useState([])
@@ -47,11 +47,16 @@ function TaskList({ owner }) {
   }
 
   const delTask  = (task) => {
-    let tasks = [...tasksList]
-    let index = tasks.findIndex( taskItem => taskItem.id === task.id )
-//    tasks.push(task)
-    tasks.splice(index,1)
-    setTasksList(tasks)
+    deleteDoc(doc(firebaseDb, "todos", task.id+""))
+      .then(() => {
+        getTodos(firebaseDb)
+        .then( (res) => setTasksList(res))
+      })
+    // let tasks = [...tasksList]
+    // let index = tasks.findIndex( taskItem => taskItem.id === task.id )
+    // //    tasks.push(task)
+    // tasks.splice(index,1)
+    // setTasksList(tasks)
   }
 
   const editTask = (task) => {
