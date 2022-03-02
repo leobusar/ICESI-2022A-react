@@ -6,7 +6,9 @@ import TaskForm from './TaskForm'
 //import firebase from  '../config/firebase'
 //import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore'
 
-function TaskList({ owner }) {
+function TaskList() {
+  let owner= { nombre:"Leonardo", apellido:"Bustamante"}
+
   const [tasksList, setTasksList] = useState([])
   const [taskEdit, setTaskEdit] = useState({})
   //const firebaseDb = getFirestore(firebase)

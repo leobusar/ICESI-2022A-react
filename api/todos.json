@@ -3,8 +3,8 @@
     {
       "userId": 1,
       "id": 1,
-      "title": "delectus aut autem",
-      "completed": false
+      "title": "delectus aut autemddd",
+      "completed": true
     },
     {
       "userId": 1,
@@ -28,11 +28,6 @@
       "title": "Prueba otra",
       "id": 4806,
       "completed": false
-    },
-    {
-      "title": "otra prueba",
-      "completed": true,
-      "id": 1067
     }
   ]
 }
